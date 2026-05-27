@@ -29,8 +29,9 @@ public class RecipeController {
     // Example call:
     // GET /api/v1/recipes?name=pasta&tag=vegetarian&includedIngredients=tomato,garlic
     @GetMapping
-    @Operation(summary = "Search recipes with dynamic, aggregate filters based on user input",
-        description = "Returns a paginated list of recipe summaries matching the optional criteria defined.")
+    @Operation(summary = "Search recipes with dynamic filters.",
+        description = "Retrieves a paginated list of recipe summaries tailored to your search criteria and" +
+                " selected ingredient filters.")
     public ResponseEntity<Page<RecipeSearchResult>> searchRecipes(
             @ParameterObject @ModelAttribute RecipeSearchRequest request,
             @PageableDefault(size = 25, sort = "id") Pageable pageable) {
@@ -40,9 +41,9 @@ public class RecipeController {
 
     // GET /api/v1/recipes/1
     @GetMapping("/{id}")
-    @Operation(summary = "Fetches the full details of a specific recipe",
-        description = "Returns a single recipe based on the specific ID provided, including steps, ingredients, and" +
-                "dynamically added tags.")
+    @Operation(summary = "Retrieve a specific recipe by ID.",
+        description = "Fetches complete details for a single recipe, including preparation steps, ingredients, " +
+                "and dynamically assigned tags.")
     public ResponseEntity<Recipe> fetchById(@PathVariable Long id) {
         Recipe recipe = recipeService.getRecipeById(id);
         return ResponseEntity.ok(recipe);
@@ -50,8 +51,9 @@ public class RecipeController {
 
     //POST /api/v1/recipes
     @PostMapping
-    @Operation(summary = "Creates a new recipe",
-        description = "Converts the JSON payload into a new recipe, along with its steps, ingredients, and dynamic tags.")
+    @Operation(summary = "Creates a new recipe entry.",
+        description = "Registers a new recipe in the system, automatically processing its associated steps, " +
+                "ingredients, and descriptive tags.")
     public ResponseEntity<Recipe> createRecipe(@Valid @RequestBody RecipeRequest recipeCreateRequest) {
         Recipe newRecipe = recipeService.createRecipe(recipeCreateRequest);
         return new ResponseEntity<>(newRecipe, HttpStatus.CREATED);
@@ -60,7 +62,8 @@ public class RecipeController {
     //PUT /api/v1/recipes/1
     @PutMapping("/{id}")
     @Operation(summary = "Updates an existing recipe",
-        description = "Updates an existing recipe object, along with its steps, ingredients, and dynamic tags.")
+        description = "Modifies the details of a specific recipe, updating its configuration, steps, " +
+                "ingredients, and system tags.")
     public ResponseEntity<Recipe> updateRecipe(
             @PathVariable Long id,
             @Valid @RequestBody RecipeRequest recipeUpdateRequest) {
@@ -75,8 +78,9 @@ public class RecipeController {
 
     // DELETE /api/v1/recipes/2
     @DeleteMapping("/{id}")
-    @Operation(summary = "Deletes an existing recipe",
-        description = "Deletes an existing recipe along with its details.")
+    @Operation(summary = "Removes a recipe from the system.",
+        description = "Permanently deletes a specific recipe profile along with all associated historical data" +
+                " and details.")
     public ResponseEntity<Void> deleteRecipe(
             @PathVariable Long id) {
         recipeService.deleteRecipe(id);
