@@ -5,6 +5,8 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.List;
+
 @Data
 @Builder
 @NoArgsConstructor
@@ -12,8 +14,8 @@ import lombok.NoArgsConstructor;
 public class RecipeSearchRequest {
     String name;
     Integer servingSize;
-    String tag;
-    String instruction;
-    String includeIngredient;
-    String excludeIngredient;
+    List<String> tags;
+    List<String> instructions;
+    List<String> includeIngredients;
+    List<String> excludeIngredients;
 }

@@ -31,17 +31,25 @@ public class RecipeService {
         if (request.getServingSize() != null) {
             spec = spec.and(RecipeSpecifications.hasServingSize(request.getServingSize()));
         }
-        if (request.getTag() != null && !request.getTag().isBlank()) {
-            spec = spec.and(RecipeSpecifications.hasTag(request.getTag()));
+        if (request.getTags() != null) {
+            for (String tag : request.getTags()) {
+                spec = spec.and(RecipeSpecifications.hasTag(tag));
+            }
         }
-        if (request.getInstruction() != null && !request.getInstruction().isBlank()) {
-            spec = spec.and(RecipeSpecifications.instructionContains(request.getInstruction()));
+        if (request.getInstructions() != null) {
+            for (String instruction : request.getInstructions()) {
+                spec = spec.and(RecipeSpecifications.instructionContains(instruction));
+            }
         }
-        if (request.getIncludeIngredient() != null && !request.getIncludeIngredient().isBlank()) {
-            spec = spec.and(RecipeSpecifications.includesIngredient(request.getIncludeIngredient()));
+        if (request.getIncludeIngredients() != null) {
+            for (String ingredient : request.getIncludeIngredients()) {
+                spec = spec.and(RecipeSpecifications.includesIngredient(ingredient));
+            }
         }
-        if (request.getExcludeIngredient() != null && !request.getExcludeIngredient().isBlank()) {
-            spec = spec.and(RecipeSpecifications.excludesIngredient(request.getExcludeIngredient()));
+        if (request.getExcludeIngredients() != null) {
+            for (String ingredient : request.getExcludeIngredients()) {
+                spec = spec.and(RecipeSpecifications.excludesIngredient(ingredient));
+            }
         }
 
         return recipeRepository.findBy(spec, query -> query

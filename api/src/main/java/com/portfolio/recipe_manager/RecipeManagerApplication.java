@@ -31,6 +31,7 @@ public class RecipeManagerApplication {
 			recipeService.searchRecipes(req, pageable).forEach(recipe -> {
 				System.out.println("Recipe ID: " + recipe.getId());
 				System.out.println("Name: " + recipe.getName());
+				System.out.println("Description: " + recipe.getDescription());
 				System.out.println();
 			});
 			System.out.println("--END DATABASE FETCH--");
