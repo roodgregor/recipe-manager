@@ -3,6 +3,7 @@ package com.portfolio.recipe_manager.service;
 import com.portfolio.recipe_manager.dto.RecipeSearchRequest;
 import com.portfolio.recipe_manager.entity.Recipe;
 import com.portfolio.recipe_manager.entity.RecipeSearchResult;
+import com.portfolio.recipe_manager.exception.RecipeNotFoundException;
 import com.portfolio.recipe_manager.repository.RecipeRepository;
 import com.portfolio.recipe_manager.repository.specification.RecipeSpecifications;
 import org.springframework.data.domain.Page;
@@ -10,6 +11,8 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.Optional;
 
 @Service
 public class RecipeService {
@@ -55,5 +58,11 @@ public class RecipeService {
         return recipeRepository.findBy(spec, query -> query
                 .as(RecipeSearchResult.class)
                 .page(pageable));
+    }
+
+    @Transactional(readOnly = true)
+    public Recipe getRecipeById(Long recipeId) {
+        return recipeRepository.findById(recipeId)
+                .orElseThrow(() -> new RecipeNotFoundException("No recipe found by this id: " + recipeId));
     }
 }
