@@ -1,4 +1,4 @@
-package com.portfolio.recipe_manager.entity;
+package com.portfolio.recipe_manager.dto;
 
 public interface RecipeSearchResult {
     Long getId();

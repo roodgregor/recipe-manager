@@ -12,7 +12,7 @@ import java.util.List;
 @Getter
 @Setter
 @NoArgsConstructor
-public class RecipeCreateRequest {
+public class RecipeRequest {
     @NotBlank(message = "Recipe name cannot be blank.")
     private String name;
     @Min(value = 1, message = "Serving size must be at least 1.")
@@ -21,8 +21,8 @@ public class RecipeCreateRequest {
     private Integer cookingTimeInMinutes = 1;
     private String description;
     @NotEmpty(message = "Recipe must have at least one ingredient.")
-    private List<IngredientCreateRequest> ingredients;
+    private List<IngredientRequest> ingredients;
     @NotEmpty(message = "Recipe must have at least one step.")
-    private List<StepCreateRequest> steps;
-    private List<TagCreateRequest> tags;
+    private List<StepRequest> steps;
+    private List<TagRequest> tags;
 }

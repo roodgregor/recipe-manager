@@ -11,7 +11,7 @@ import java.math.BigDecimal;
 @Getter
 @Setter
 @NoArgsConstructor
-public class IngredientCreateRequest {
+public class IngredientRequest {
     @NotNull(message = "Ingredient quantity shouldn't be empty.")
     private BigDecimal quantity;
     @NotBlank(message = "Unit of measure cannot be blank.")

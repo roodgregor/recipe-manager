@@ -9,7 +9,7 @@ import lombok.Setter;
 @Getter
 @Setter
 @NoArgsConstructor
-public class StepCreateRequest {
+public class StepRequest {
     @NotNull(message = "Step count must be provided.")
     private Integer stepCount;
     @NotBlank(message = "Instruction step cannot be blank.")

@@ -7,7 +7,6 @@ import lombok.Setter;
 @Getter
 @Setter
 @NoArgsConstructor
-public class TagCreateRequest {
-    private Long id;
+public class TagRequest {
     private String tag;
 }

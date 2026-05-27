@@ -1,7 +1,8 @@
 package com.portfolio.recipe_manager.service;
 
-import com.portfolio.recipe_manager.dto.RecipeCreateRequest;
+import com.portfolio.recipe_manager.dto.RecipeRequest;
 import com.portfolio.recipe_manager.dto.RecipeSearchRequest;
+import com.portfolio.recipe_manager.dto.RecipeSearchResult;
 import com.portfolio.recipe_manager.entity.*;
 import com.portfolio.recipe_manager.exception.DuplicateStepException;
 import com.portfolio.recipe_manager.exception.RecipeNotFoundException;
@@ -13,6 +14,7 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.OffsetDateTime;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -71,15 +73,8 @@ public class RecipeService {
                 .orElseThrow(() -> new RecipeNotFoundException("No recipe found by this id: " + recipeId));
     }
 
-    @Transactional
-    public Recipe createRecipe(RecipeCreateRequest request) {
+    private Recipe populateRecipeFields(Recipe recipe, RecipeRequest request) {
         Set<String> matchedTags = new HashSet<>();
-        Recipe recipe = Recipe.builder()
-                .name(request.getName())
-                .servingSize(request.getServingSize())
-                .cookingTimeInMinutes(request.getCookingTimeInMinutes())
-                .description(request.getDescription())
-                .build();
 
         if (request.getIngredients() != null) {
             request.getIngredients().forEach(req -> {
@@ -116,12 +111,46 @@ public class RecipeService {
 
         if (!matchedTags.isEmpty()) {
             matchedTags.forEach(tagName -> {
-               RecipeTag tag = new RecipeTag();
-               tag.setTag(tagName);
-               recipe.addTag(tag);
+                RecipeTag tag = new RecipeTag();
+                tag.setTag(tagName);
+                recipe.addTag(tag);
             });
         }
 
         return recipeRepository.save(recipe);
+    }
+
+    @Transactional
+    public Recipe createRecipe(RecipeRequest request) {
+        Recipe recipe = Recipe.builder()
+                .name(request.getName())
+                .servingSize(request.getServingSize())
+                .cookingTimeInMinutes(request.getCookingTimeInMinutes())
+                .description(request.getDescription())
+                .build();
+        return populateRecipeFields(recipe, request);
+    }
+
+    @Transactional
+    public Recipe updateRecipe(RecipeRequest request, Recipe originalRecipe) {
+        // DB deletion enabled by orphanRemoval=true in Recipe.java entity
+        originalRecipe.getIngredients().clear();
+        originalRecipe.getSteps().clear();
+        originalRecipe.getTags().clear();
+
+        originalRecipe.setName(request.getName());
+        originalRecipe.setServingSize(request.getServingSize());
+        originalRecipe.setCookingTimeInMinutes(request.getCookingTimeInMinutes());
+        originalRecipe.setDescription(request.getDescription());
+        originalRecipe.setUpdatedAt(OffsetDateTime.now());
+
+        return populateRecipeFields(originalRecipe, request);
+    }
+
+    @Transactional
+    public void deleteRecipe(Long recipeId) {
+        recipeRepository.deleteById(recipeId);
+        // can also be a way to implement soft deletion.
+        // Requires an audit table and a archive/inactive column in the Recipes table in the DB
     }
 }
