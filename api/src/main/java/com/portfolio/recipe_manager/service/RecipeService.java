@@ -36,7 +36,9 @@ public class RecipeService {
         Specification<Recipe> spec = Specification.unrestricted();
 
         if (request.getName() != null && !request.getName().isBlank()) {
-            spec = spec.and(RecipeSpecifications.nameContains(request.getName()));
+            Specification<Recipe> nameAndDescriptionSpec = RecipeSpecifications.nameContains(request.getName())
+                    .or(RecipeSpecifications.descriptionContains(request.getName()));
+            spec = spec.and(nameAndDescriptionSpec);
         }
         if (request.getServingSize() != null) {
             spec = spec.and(RecipeSpecifications.hasServingSize(request.getServingSize()));

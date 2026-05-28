@@ -14,6 +14,11 @@ public class RecipeSpecifications {
                 criteriaBuilder.like(criteriaBuilder.lower(root.get("name")), '%' + name.toLowerCase() + '%');
     }
 
+    public static Specification<Recipe> descriptionContains(String keyword) {
+        return (root, query, criteriaBuilder) ->
+                criteriaBuilder.like(criteriaBuilder.lower(root.get("description")), '%' + keyword.toLowerCase() + '%');
+    }
+
     // Find by exact serving size
     public static Specification<Recipe> hasServingSize(Integer servingSize) {
         return (root, query, criteriaBuilder) ->

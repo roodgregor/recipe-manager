@@ -10,23 +10,30 @@ function RecipeDashboard() {
     useEffect(() => {
         getAllRecipes()
             .then((response) => {
-                setRecipes(response.data.content)
+                setRecipes(response.data.content || [])
             })
             .catch((error) => console.error("Error fetching recipes:", error));
     }, []);
 
     // onclick search result for full payload
     const handleSelectRecipe = (leanRecipe) => {
-        console.log("clicked! Recipe name: " + leanRecipe.name);
         getRecipeById(leanRecipe.id)
             .then(response => {
-                console.log(currentRecipe);
-                console.log(response.data);
-                console.log('content: ' + response.data.content);
-                setCurrentRecipe(response.data);
+                setCurrentRecipe(response.data || []);
             })
             .catch(error => {
                 console.error(`Error fetching full payload of recipe ID ${leanRecipe.id}:`, error)
+            });
+    };
+
+    // applied filters search
+    const handleSearch = (filterPayload) => {
+        getAllRecipes(filterPayload)
+            .then(response => {
+                setRecipes(response.data.content || [])
+            })
+            .catch(error => {
+                console.error('Error fetching recipes with selected payload:', error)
             });
     };
 
@@ -52,6 +59,7 @@ function RecipeDashboard() {
                     recipes={recipes}
                     onSelectRecipe={handleSelectRecipe}
                     onNewRecipeClick={handleClearForm}
+                    onSearch={handleSearch}
                 />
             </div>
 

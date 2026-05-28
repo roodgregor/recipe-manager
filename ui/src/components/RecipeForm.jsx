@@ -201,26 +201,10 @@ function RecipeForm({ selectedRecipe, onClear }) {
 
                 {/* --- Form Control Actions --- */}
                 <div style={{ display: 'flex', gap: '12px', marginTop: '10px', justifyContent: 'flex-start' }}>
-                    <button type="submit" style={{
-                        padding: '10px 24px',
-                        backgroundColor: '#007bff',
-                        color: 'white',
-                        border: 'none',
-                        borderRadius: '6px',
-                        fontWeight: 'bold',
-                        cursor: 'pointer'
-                    }}>
+                    <button type="submit" className='highlighted-button'>
                         {selectedRecipe?.id ? "Update Recipe" : "Create Recipe"}
                     </button>
-                    <button type="button" onClick={onClear} style={{
-                        padding: '10px 24px',
-                        backgroundColor: '#6c757d',
-                        color: 'white',
-                        border: 'none',
-                        borderRadius: '6px',
-                        fontWeight: 'bold',
-                        cursor: 'pointer'
-                    }}>
+                    <button type="button" onClick={onClear} className='highlighted-button' style={{backgroundColor: 'gray'}}>
                         Clear Fields
                     </button>
                 </div>
