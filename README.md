@@ -6,13 +6,29 @@ A full-stack recipe management system built without fluff. Small, but charming!
 
 ## Tech Stack
 
-- Starter: Spring Initializr (https://start.spring.io)
-- Backend Engine: Spring Boot v4.0.6 (Java 17)
-- Frontend: React + Vite _(for lightweight deployment)_
-- Data Persistence: PostgreSQL + Spring Data JPA/Hibernate
-- Migration Control: Flyway
-- Documentation: OpenAPI 3 / Swagger UI
-- No Authentication: Set up assumes single-user system
+### Backend
+- **Language & SDK:** Java 17 (SDK 17.02.12)
+- **Framework:** Spring Boot 3.x (Initialized via Spring Initializr)
+- **Data Persistence:** Spring Data JPA / Hibernate
+- **Database Migrations:** Flyway
+- **API Documentation:** OpenAPI 3 / Swagger UI (via SpringDoc v2.8.5)
+- **Utility:** Project Lombok (for boilerplate reduction)
+
+### Frontend
+- **Library:** React.js
+- **Build Tool:** Vite (chosen for lightweight, high-performance local development and deployment)
+- **Package Manager:** Node v24.16.0 / NPM v11.13.0
+
+### Database
+- **Engine:** PostgreSQL 14
+
+---
+
+## System Architecture & Scope
+
+This application is purposefully architected as a **single-user system**. To ensure an uninhibited, streamlined user experience for personal recipe tracking, **no authentication layer is enforced**.
+
+---
 
 ## Key Design Choices
 
@@ -23,17 +39,19 @@ A full-stack recipe management system built without fluff. Small, but charming!
 - Dynamic query using Specifications under the JpaSpecificationExecutor to enable stacking multipe filters without complicated query chaining.
 - Used React as the Frontend to demonstrate RESTful API instead of using cURL or an external tool like Postman for ease of use and better demonstration of Frontend/Backend connection.
 
-## Get Started! (Local Dev)
+---
+
+## Getting Started! 🚀
 
 ### Pre-requisites
 
-This is the set-up used in the project
-- Java 17 SDK (17.02.12)
-- PostgreSQL 14
-- NPM 11.13.0
-- Node 24.16.0
-- SpringDoc / Swagger API 2.8.5
-- DBeaver (if you want to view the DB directly)
+Ensure you have the following installed on your local machine:
+- **Java Development Kit (JDK) 17** (Specifically `17.02.12` or compatible)
+- **Node.js** `v24.16.0` and **NPM** `v11.13.0`
+- **PostgreSQL 14** instance running locally
+- **Git** `v2.53` (if you want to make local changes)
+
+---
 
 ### Clone the repository
 
@@ -43,11 +61,83 @@ cd recipe-manager
 ```
 **recipe-manager** contains both **api** and **ui** directories inside of it.
 
-## Assumptions & Boundaries
+---
 
-- Unit testing was not completed for the sake of time and not present on the requirement list. If implemented, I would have used **JUnit** and **Mockito**, targeting the service layer, and covering the methods inside RecipeService.java.
-- Frontend is not fully fleshed out since it is not the priority of the demonstration, but may be further developed in future versions.
-- Chose to implement a dynamic tagging system to detect if recipes fall under criteria such as vegetarian, dairy, etc. for a smoother experience. Some tags may be inaccurate due to similar usages (e.g. 'bake' can be used for deserts and oven baked poultry).
-- Intentionally polluting inputs might fall through UI validation.
-- I did not apply a user management system, assuming everything is just a single person's recipes. Adding a management system to the existing set up would not be difficult as the tables are easily extendable for that case.
-- 
+### Database Setup
+
+Create an empty database in your local PostgreSQL instance for the application to connect to. In my case, I named it as `recipe_db`. We will use this later in the `application.properties` API configuration.
+```
+spring.datasource.url=jdbc:postgresql://localhost:5432/recipe_db
+spring.datasource.username=postgres
+spring.datasource.password=
+spring.datasource.driver-class-name=org.postgresql.Driver
+```
+
+For ease of use, I recommend a GUI client like DBeaver.
+
+---
+
+### Backend Setup
+
+The backend is built using Maven. I use IntelliJ IDEA for the maven wrapper that comes with it, saving me the trouble of installing Maven on my local device. Most of the time, I am executing via the GUI anyway.
+
+#### Running with IntelliJ IDEA
+1. Open IntelliJ IDEA and select Open.
+2. Navigate to the `api` (`/recipe-manager/api`) directory (containing the pom.xml file).
+3. Wait for IntelliJ to sync and download the Maven dependencies.
+4. Or, click the Maven side panel to install dependencies if not triggered.
+5. Verify in the Build Output section if the Maven build finished successfully, with no errors.
+6. Navigate to `/api/src/main/java/com/portfolio/recipe_manager/RecipeManagerApplication.java`
+7. Click the green **Run** play button next to the main method.
+
+Once started, the backend server will spin up and listen on:
+
+🔗 http://localhost:8080
+
+---
+
+### Frontend Setup
+
+Since this is a monorepo setup, the React frontend is already in the same repository, under the `ui` directory.
+
+Open a Terminal window (best in IntelliJ IDEA) to initialize the UI.
+
+1. Navigate to the `ui` (`/recipe-manager/ui`) directory.
+2. Install the lightweight development dependencies: `npm install`
+3. Boot up the Vite local development server: `npm run dev`
+
+Once fully compiled, the frontend server will spin up and listen on:
+
+🔗 http://localhost:5173
+
+#### Cors Configuration
+
+By default, the `port 5173` is already allowed through the CORS configuration in `WebConfig.java`. For any port modifications, adjust the allowed-origins in this file.
+
+---
+
+### API Documentation & Testing
+
+The backend includes native OpenAPI 3 documentation. While the application is running, you can test endpoints, read schema payloads, and view the interactive documentation generated by SpringDoc/Swagger UI by visiting:
+
+🔗 http://localhost:8080/swagger-ui/index.html
+
+---
+
+## Design Choices, Assumptions & Boundaries
+
+Every engineering project involves trade-offs. To deliver a defensible, functional prototype within a realistic timeline, I made the following intentional design decisions and scope boundaries:
+
+* **Architecture & Scope (Single-User System):** I intentionally omitted a user management and authentication system, assuming this iteration operates purely as a personal, single-user culinary notebook. However, the database schema was designed with extensibility in mind; mapping recipes to a `users` table in the future would require minimal refactoring. Additionally, auditing fields such as `created_at` and `updated_at` are already in place.
+* **Testing Strategy:** Due to time constraints and the core requirements list, automated unit testing was skipped for this initial build. Had this been a production-grade assignment, my strategy would involve utilizing **JUnit** and **Mockito** to thoroughly test the service layer, focusing on isolating and validating the business logic inside `RecipeService.java`.
+* **Frontend vs. Backend Focus:** The primary goal of this demonstration was to showcase a robust, type-safe Java backend. As a result, the React/Vite frontend is functional but lightweight. It serves as a visual bridge to interact with the API rather than a fully fleshed-out, production-ready UI product.
+* **API Testing Choice:** While using Postman or cURL would have omitted the necessity to create a Frontend UI, my experience dictates that a lot of the bugs and usability concerns are found during the Fullstack integration. While idioms and best-practices were meticulously applied, I wanted to showcase my capacity to deliver APIs that are designed with user/consumer in mind instead of sandboxed to just CLI or Postman executions.
+* **The Dynamic Tagging System:** To elevate the user experience, I implemented a dynamic tagging mechanism that automatically categorizes recipes (e.g., *Vegetarian*, *Dairy-Free*, *Baked*). Because this relies on string matching, there are known boundary edge cases—for example, the keyword "bake" might flag both a pastry dessert and an oven-roasted chicken. Refining this parser would be a top priority for version 2.0.
+* **Input Validation Boundary:** While basic guardrails are in place, rigorous edge-case sanitation against intentionally malformed or "polluted" inputs is currently limited on the frontend. Standard backend exception handling catches major failures, but stricter UI validation regexes are a acknowledged fast-follow.
+
+---
+
+## Author
+
+- Joshua Medina
+- GitHub: @roodgregor
