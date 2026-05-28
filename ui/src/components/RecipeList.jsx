@@ -41,7 +41,7 @@ function RecipeList({ recipes, onSelectRecipe, onSearch }) {
 
     return (
         <div style={{ display: 'flex', flexDirection: 'column', gap: '15px' }}>
-            <h1>Recipe Manager</h1>
+            <h2>🍳 Recipe Manager</h2>
 
             <form onSubmit={handleSearchSubmit} className='search-box'>
                 <div>

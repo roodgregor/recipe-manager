@@ -33,11 +33,16 @@ public class RecipeService {
     public Page<RecipeSearchResult> searchRecipes(
             RecipeSearchRequest request,
             Pageable pageable) {
-        Specification<Recipe> spec = Specification.unrestricted();
+        // Replaces Specification.where(null) without using deprecated or missing methods
+        // Cannot use Specification.where(null) -> deprecated as of 3.5.0
+        // Cannot use Specification.unrestricted() -> introduced in 3.5.2
+        Specification<Recipe> spec = (root, query, builder) -> builder.conjunction();
 
         if (request.getName() != null && !request.getName().isBlank()) {
             Specification<Recipe> nameAndDescriptionSpec = RecipeSpecifications.nameContains(request.getName())
-                    .or(RecipeSpecifications.descriptionContains(request.getName()));
+                    .or(RecipeSpecifications.descriptionContains(request.getName()))
+                    .or(RecipeSpecifications.includesIngredient(request.getName()))
+                    .or(RecipeSpecifications.instructionContains(request.getName()));
             spec = spec.and(nameAndDescriptionSpec);
         }
         if (request.getServingSize() != null) {
