@@ -8,6 +8,8 @@ import com.portfolio.recipe_manager.exception.InvalidIngredientsLineException;
 import com.portfolio.recipe_manager.exception.RecipeNotFoundException;
 import com.portfolio.recipe_manager.repository.RecipeRepository;
 import com.portfolio.recipe_manager.repository.specification.RecipeSpecifications;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
@@ -29,6 +31,8 @@ public class RecipeService {
         this.taggingService = taggingService;
     }
 
+    // Deciding not to cache the result of searchRecipes since it is not only for "all recipes"
+    // The lightweight DTO of RecipeSearchResult already makes the payload manageable
     @Transactional(readOnly = true)
     public Page<RecipeSearchResult> searchRecipes(
             RecipeSearchRequest request,
@@ -74,12 +78,14 @@ public class RecipeService {
                 .page(pageable));
     }
 
+    @Cacheable(value = "recipe", key = "#recipeId")
     @Transactional(readOnly = true)
     public Recipe getRecipeById(Long recipeId) {
         return recipeRepository.findById(recipeId)
                 .orElseThrow(() -> new RecipeNotFoundException("No recipe found by this id: " + recipeId));
     }
 
+    @Cacheable(value = "recipe", key = "#name")
     @Transactional(readOnly = true)
     public Recipe getRecipeByName(String name) {
         return recipeRepository.findByName(name)
@@ -130,6 +136,7 @@ public class RecipeService {
         return recipeRepository.save(recipe);
     }
 
+    @CacheEvict(value = {"recipe"}, allEntries = true)
     @Transactional
     public Recipe createRecipe(RecipeRequest request) {
         Recipe recipe = Recipe.builder()
@@ -144,6 +151,7 @@ public class RecipeService {
         return populateRecipeFields(recipe, request);
     }
 
+    @CacheEvict(value = {"recipe"}, allEntries = true)
     @Transactional
     public Recipe updateRecipe(RecipeRequest request, Recipe originalRecipe) {
         // DB deletion enabled by orphanRemoval=true in Recipe.java entity
@@ -161,6 +169,7 @@ public class RecipeService {
         return populateRecipeFields(originalRecipe, request);
     }
 
+    @CacheEvict(value = {"recipe"}, allEntries = true)
     @Transactional
     public void deleteRecipe(Long recipeId) {
         recipeRepository.deleteById(recipeId);
