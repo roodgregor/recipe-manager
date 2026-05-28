@@ -8,6 +8,7 @@ function RecipeForm({ selectedRecipe, onRefresh }) {
     const [servingSize, setServingSize] = useState('');
     const [cookingTimeInMinutes, setCookingTimeInMinutes] = useState('');
     const [recipeImageUrl, setRecipeImageUrl] = useState('');
+    const [updatedAt, setUpdatedAt] = useState('');
     const [ingredients, setIngredients] = useState('');
     const [steps, setSteps] = useState('');
     const [tags, setTags] = useState([]);
@@ -22,12 +23,25 @@ function RecipeForm({ selectedRecipe, onRefresh }) {
 
     const isEditMode = Boolean(selectedRecipe?.id);
 
+    const formatDate = (rawDate) => {
+        const date = new Date(rawDate);
+        return new Intl.DateTimeFormat(undefined, {
+            year: 'numeric',
+            month: 'long',
+            day: 'numeric',
+            hour: 'numeric',
+            minute: 'numeric',
+            hour12: true
+        }).format(date);
+    };
+
     const clearForm = () => {
         setName('');
         setDescription('');
         setServingSize('');
         setCookingTimeInMinutes('');
         setRecipeImageUrl('')
+        setUpdatedAt('');
         setIngredients('');
         setSteps('');
         setTags([]);
@@ -110,7 +124,6 @@ function RecipeForm({ selectedRecipe, onRefresh }) {
                 response = await updateRecipe(selectedRecipe.id, fullRecipePayload);
                 console.log('Recipe updated successfully: ', response.data);
                 toast.success(`'${name}' updated successfully!`);
-                clearForm();
             } else {
                 // call create POST API call
                 response = await createNewRecipe(fullRecipePayload);
@@ -134,6 +147,7 @@ function RecipeForm({ selectedRecipe, onRefresh }) {
             setServingSize(selectedRecipe.servingSize || '');
             setCookingTimeInMinutes(selectedRecipe.cookingTimeInMinutes || '');
             setRecipeImageUrl(selectedRecipe.recipeImageUrl || '');
+            setUpdatedAt(selectedRecipe.updatedAt || '');
             setTags(selectedRecipe.tags || []);
 
             // Map Ingredients array to textarea
@@ -311,6 +325,13 @@ function RecipeForm({ selectedRecipe, onRefresh }) {
                         </button>
                     )}
                 </div>
+                {updatedAt && (
+                    <label className='label-style' style=
+                        {{marginRight: 'auto', fontStyle: 'italic', fontWeight: 'normal',
+                        fontSize: '10px'}}>
+                        Last Updated At: {formatDate(updatedAt)}
+                    </label>
+                )}
             </form>
         </div>
     );
