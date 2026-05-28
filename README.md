@@ -30,17 +30,6 @@ This application is purposefully architected as a **single-user system**. To ens
 
 ---
 
-## Key Design Choices
-
-- **Recipe** entity as an aggregate root, where the ingredients and instruction steps are bound as child entities of the master recipe, in a one-to-many relationship.
-- The call architecture is orchestrated all through the **RecipeRepository**
-- Decided to implement interface reflections with the search results, only fetching the ID, Name, and Description for each recipe item queried by any of the filtering mechanisms.
-- Utilized DTOs such as _RecipeRequest_ for contracts, decoupling, and explicit privacy.
-- Dynamic query using Specifications under the JpaSpecificationExecutor to enable stacking multipe filters without complicated query chaining.
-- Used React as the Frontend to demonstrate RESTful API instead of using cURL or an external tool like Postman for ease of use and better demonstration of Frontend/Backend connection.
-
----
-
 ## Getting Started! 🚀
 
 ### Pre-requisites
@@ -133,10 +122,12 @@ Every engineering project involves trade-offs. To deliver a defensible, function
 * **Database Optimization (Indexing):** To ensure the application scales seamlessly as the recipe catalog grows, I implemented a PostgreSQL B-Tree index on high-frequency query columns (such as the recipe `name`). This transitions database lookups from $O(N)$ sequential scans to highly efficient $O(\log N)$ logarithmic searches, maintaining rapid API response times under load.
 * **Architecture & Scope (Single-User System):** I intentionally omitted a user management and authentication system, assuming this iteration operates purely as a personal, single-user culinary notebook. However, the database schema was designed with extensibility in mind; mapping recipes to a `users` table in the future would require minimal refactoring. Additionally, auditing fields such as `created_at` and `updated_at` are already in place.
 * **Testing Strategy:** Due to time constraints and the core requirements list, automated unit testing was skipped for this initial build. Had this been a production-grade assignment, my strategy would involve utilizing **JUnit** and **Mockito** to thoroughly test the service layer, focusing on isolating and validating the business logic inside `RecipeService.java`.
-* **Frontend vs. Backend Focus:** The primary goal of this demonstration was to showcase a robust, type-safe Java backend. As a result, the React/Vite frontend is functional but lightweight. It serves as a visual bridge to interact with the API rather than a fully fleshed-out, production-ready UI product.
-* **API Testing Choice:** While using Postman or cURL would have omitted the necessity to create a Frontend UI, my experience dictates that a lot of the bugs and usability concerns are found during the Fullstack integration. While idioms and best-practices were meticulously applied, I wanted to showcase my capacity to deliver APIs that are designed with user/consumer in mind instead of sandboxed to just CLI or Postman executions.
+* **React-Driven RESTful Demo:** Developed a React frontend to demonstrate the REST API in action. This replaces raw cURL or Postman tests with a visual, user-friendly interface that clearly highlights the client-server connection. The primary goal of this demonstration was to showcase a robust Java backend. As a result, the React/Vite frontend is functional but lightweight. It serves as a visual bridge to interact with the API rather than a fully fleshed-out, production-ready UI product.
 * **The Dynamic Tagging System:** To elevate the user experience, I implemented a dynamic tagging mechanism that automatically categorizes recipes (e.g., *Vegetarian*, *Dairy-Free*, *Baked*). Because this relies on string matching, there are known boundary edge cases—for example, the keyword "bake" might flag both a pastry dessert and an oven-roasted chicken. Refining this parser would be a top priority for version 2.0.
 * **Input Validation Boundary:** While basic guardrails are in place, rigorous edge-case sanitation against intentionally malformed or "polluted" inputs is currently limited on the frontend. Standard backend exception handling catches major failures, but stricter UI validation regexes are a acknowledged fast-follow.
+* **Aggregate Root Architecture:** Modeled the `Recipe` entity as an aggregate root, binding `ingredients`, `instructions`, and `tags` as child entities in a strict one-to-many relationship. All persistence calls are cleanly orchestrated through the RecipeRepository.
+* **Lightweight Search Projections:** Implemented interface-based projections for search results. Queries only fetch the ID, Name, and Description of the recipe item, keeping the application fast and efficient.
+* **Dynamic Filtering with Specifications:** Built dynamic, stackable queries using JPA Specifications and JpaSpecificationExecutor. This allows for multiple search filters to be applied simultaneously without messy query chaining.
 
 ---
 
