@@ -8,11 +8,7 @@ function RecipeDashboard() {
     const [currentRecipe, setCurrentRecipe] = useState(null);
 
     useEffect(() => {
-        getAllRecipes()
-            .then((response) => {
-                setRecipes(response.data.content || [])
-            })
-            .catch((error) => console.error("Error fetching recipes:", error));
+        handleSearch();
     }, []);
 
     // onclick search result for full payload
@@ -37,8 +33,9 @@ function RecipeDashboard() {
             });
     };
 
-    const handleClearForm = () => {
+    const handleRefresh = () => {
         setCurrentRecipe(null);
+        handleSearch();
     };
 
     return (
@@ -58,7 +55,6 @@ function RecipeDashboard() {
                 <RecipeList
                     recipes={recipes}
                     onSelectRecipe={handleSelectRecipe}
-                    onNewRecipeClick={handleClearForm}
                     onSearch={handleSearch}
                 />
             </div>
@@ -73,7 +69,7 @@ function RecipeDashboard() {
             }}>
                 <RecipeForm
                     selectedRecipe={currentRecipe}
-                    onClear={handleClearForm}
+                    onRefresh={handleRefresh}
                 />
             </div>
 

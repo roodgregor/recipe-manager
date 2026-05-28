@@ -4,7 +4,7 @@ import com.portfolio.recipe_manager.dto.RecipeRequest;
 import com.portfolio.recipe_manager.dto.RecipeSearchRequest;
 import com.portfolio.recipe_manager.dto.RecipeSearchResult;
 import com.portfolio.recipe_manager.entity.*;
-import com.portfolio.recipe_manager.exception.DuplicateStepException;
+import com.portfolio.recipe_manager.exception.InvalidIngredientsLineException;
 import com.portfolio.recipe_manager.exception.RecipeNotFoundException;
 import com.portfolio.recipe_manager.repository.RecipeRepository;
 import com.portfolio.recipe_manager.repository.specification.RecipeSpecifications;
@@ -75,31 +75,34 @@ public class RecipeService {
                 .orElseThrow(() -> new RecipeNotFoundException("No recipe found by this id: " + recipeId));
     }
 
+    @Transactional(readOnly = true)
+    public Recipe getRecipeByName(String name) {
+        return recipeRepository.findByName(name)
+                .orElse(null);
+    }
+
     private Recipe populateRecipeFields(Recipe recipe, RecipeRequest request) {
         Set<String> matchedTags = new HashSet<>();
 
         if (request.getIngredients() != null) {
             request.getIngredients().forEach(req -> {
-                RecipeIngredient ingredient = new RecipeIngredient();
-                ingredient.setName(req.getName());
-                ingredient.setUnit(req.getUnit());
-                ingredient.setQuantity(req.getQuantity());
-                recipe.addIngredient(ingredient);
+                try {
+                    RecipeIngredient ingredient = new RecipeIngredient();
+                    ingredient.setName(req.getName());
+                    ingredient.setUnit(req.getUnit());
+                    ingredient.setQuantity(req.getQuantity());
+                    recipe.addIngredient(ingredient);
 
-                matchedTags.addAll(taggingService.processEntry(
-                        ingredient.getName(), TaggingService.CatalogType.INGREDIENT));
+                    matchedTags.addAll(taggingService.processEntry(
+                            ingredient.getName(), TaggingService.CatalogType.INGREDIENT));
+                } catch (Exception e) {
+                    throw new InvalidIngredientsLineException("Invalid ingredients.");
+                }
             });
         }
 
         if (request.getSteps() != null) {
-            Set<Integer> stepCountSet = new HashSet<>();
             request.getSteps().forEach(req -> {
-                Integer stepCount = req.getStepCount();
-                if (stepCountSet.contains(stepCount)) {
-                    throw new DuplicateStepException("This recipe already has a step " + stepCount + "." +
-                            "Ensure instruction steps are sequential.");
-                }
-                stepCountSet.add(stepCount);
                 RecipeStep step = new RecipeStep();
                 step.setStepCount(req.getStepCount());
                 step.setInstruction(req.getInstruction());
@@ -129,6 +132,9 @@ public class RecipeService {
                 .servingSize(request.getServingSize())
                 .cookingTimeInMinutes(request.getCookingTimeInMinutes())
                 .description(request.getDescription())
+                .recipeImageUrl(request.getRecipeImageUrl())
+                .createdAt(OffsetDateTime.now())
+                .updatedAt(OffsetDateTime.now())
                 .build();
         return populateRecipeFields(recipe, request);
     }
@@ -145,6 +151,7 @@ public class RecipeService {
         originalRecipe.setCookingTimeInMinutes(request.getCookingTimeInMinutes());
         originalRecipe.setDescription(request.getDescription());
         originalRecipe.setUpdatedAt(OffsetDateTime.now());
+        originalRecipe.setRecipeImageUrl(request.getRecipeImageUrl());
 
         return populateRecipeFields(originalRecipe, request);
     }

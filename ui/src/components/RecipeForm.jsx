@@ -1,10 +1,13 @@
 import React, { useState, useEffect } from 'react';
+import { createNewRecipe, updateRecipe, deleteRecipe} from '../services/recipeService';
+import { toast } from 'sonner';
 
-function RecipeForm({ selectedRecipe, onClear }) {
+function RecipeForm({ selectedRecipe, onRefresh }) {
     const [name, setName] = useState('');
     const [description, setDescription] = useState('');
     const [servingSize, setServingSize] = useState('');
     const [cookingTimeInMinutes, setCookingTimeInMinutes] = useState('');
+    const [recipeImageUrl, setRecipeImageUrl] = useState('');
     const [ingredients, setIngredients] = useState('');
     const [steps, setSteps] = useState('');
     const [tags, setTags] = useState([]);
@@ -17,14 +20,120 @@ function RecipeForm({ selectedRecipe, onClear }) {
         '\nSauté the crushed garlic cloves in olive oil until golden fragrant.' +
         '\nToss the pasta directly into the sauce and ladle in hot pasta water.';
 
+    const isEditMode = Boolean(selectedRecipe?.id);
+
+    const clearForm = () => {
+        setName('');
+        setDescription('');
+        setServingSize('');
+        setCookingTimeInMinutes('');
+        setRecipeImageUrl('')
+        setIngredients('');
+        setSteps('');
+        setTags([]);
+        onRefresh();
+    };
+
+    const handleDelete = async (e) => {
+        e.preventDefault();
+
+        toast("Delete recipe?", {
+            description: "This will permanently remove your recipe.",
+            action: {
+                label: "Delete",
+                onClick: () => {
+                    toast.promise(deleteRecipe(selectedRecipe.id), {
+                        loading: 'Deleting recipe...',
+                        success: () => {
+                            clearForm();
+                            return 'Recipe deleted successfully!';
+                        },
+                        error: 'Failed to delete recipe.',
+                    });
+                }
+            }
+        });
+    };
+
+    // Create new recipe OR Update existing recipe
+    const handleSave = async (e) => {
+        e.preventDefault();
+
+        // parse textarea payload for instructions and steps
+        const lines = ingredients.split('\n').filter(line => line.trim() !== '');
+        const ingredientArray = [];
+
+        for (const line of lines) {
+            const isNumericRegex = /^(\d+(\.\d+)?|\.\d+)$/;
+            const parts = line.trim().split(' ');
+
+            if (parts.length < 2 || !isNumericRegex.test(parts[0])) {
+                toast.error('Error parsing Ingredients List', {
+                    description: `Could not parse line '${line}'. Follow the format indicated in the note below the input field. (e.g. 2 tbsp salt)`,
+                    duration: 5000
+                });
+                return;
+            }
+
+            ingredientArray.push({
+                quantity: parts[0],
+                unit: parts[1],
+                name: parts.slice(2).join(' ') || ''
+            });
+        }
+
+        const stepArray = steps.split('\n')
+            .filter(line => line.trim() !== '')
+            .map((line, idx) => (
+                {
+                    stepCount: idx + 1,
+                    instruction: line.trim() //already trimmed in filter
+                }
+            ));
+
+        const fullRecipePayload = {
+            name,
+            description,
+            servingSize,
+            cookingTimeInMinutes,
+            recipeImageUrl,
+            ingredients: ingredientArray,
+            steps: stepArray,
+            tags
+        };
+        console.log("Submitting: ", fullRecipePayload);
+
+        try {
+            let response;
+            if (isEditMode) {
+                // call update PUT API call
+                response = await updateRecipe(selectedRecipe.id, fullRecipePayload);
+                console.log('Recipe updated successfully: ', response.data);
+                toast.success(`'${name}' updated successfully!`);
+                clearForm();
+            } else {
+                // call create POST API call
+                response = await createNewRecipe(fullRecipePayload);
+                console.log('Recipe created successfully: ', response.data);
+                toast.success(`'${name}' created successfully!`);
+                clearForm();
+            }
+        } catch (error) {
+            console.error('Error:', error.response?.data || error.message);
+            toast.error('Error creating recipe', {
+                description: error.response?.data.message || error.message || 'Please verify the required fields before submitting again.',
+                duration: 5000
+            });
+        }
+    };
+
     useEffect(() => {
         if (selectedRecipe) {
             setName(selectedRecipe.name || '');
             setDescription(selectedRecipe.description || '');
             setServingSize(selectedRecipe.servingSize || '');
             setCookingTimeInMinutes(selectedRecipe.cookingTimeInMinutes || '');
-            // setIngredients(selectedRecipe.ingredients || '');
-            // setSteps(selectedRecipe.steps || '');
+            setRecipeImageUrl(selectedRecipe.recipeImageUrl || '');
             setTags(selectedRecipe.tags || []);
 
             // Map Ingredients array to textarea
@@ -46,51 +155,9 @@ function RecipeForm({ selectedRecipe, onClear }) {
                 setSteps('');
             }
         } else {
-            setName('');
-            setDescription('');
-            setServingSize('');
-            setCookingTimeInMinutes('');
-            setIngredients('');
-            setSteps('');
-            setTags([]);
+            clearForm();
         }
     }, [selectedRecipe]);
-
-    const handleSave = (e) => {
-        e.preventDefault();
-
-        // parse textarea payload for instructions and steps
-        const ingredientArray = ingredients.split('\n')
-            .filter(line => line.trim() !== '')
-            .map(line => {
-                const parts = line.trim().split(' ');
-                return {
-                    quantity: parts[0] || '',
-                    unit: parts[1] || '',
-                    name: parts.slice(2).join(' ') || ''
-                };
-            });
-
-        const stepArray = steps.split('\n')
-            .filter(line => line.trim() !== '')
-            .map((line, idx) => (
-                {
-                    stepCount: idx + 1,
-                    instruction: line.trim() //already trimmed in filter
-                }
-            ));
-
-        const fullRecipePayload = {
-            name,
-            description,
-            servingSize,
-            cookingTimeInMinutes,
-            ingredients: ingredientArray,
-            steps: stepArray,
-            tags
-        };
-        console.log("Submitting:", fullRecipePayload);
-    };
 
     return (
         <div style={{
@@ -101,37 +168,66 @@ function RecipeForm({ selectedRecipe, onClear }) {
             color: '#333333' // Force dark text
         }}>
             <h3 style={{ margin: '0 0 20px 0', color: '#212529', borderBottom: '2px solid #dee2e6', paddingBottom: '10px' }}>
-                {selectedRecipe?.id ? `Edit Recipe: ${name}` : "Create New Recipe"}
+                {isEditMode ? `Edit Recipe: ${name}` : "Create New Recipe"}
             </h3>
 
             <form onSubmit={handleSave} style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
+                {recipeImageUrl && (
+                    <div>
+                        <img
+                            src={recipeImageUrl}
+                            alt={name || "Recipe preview"}
+                            style={{
+                                width: '100%',
+                                height: '350px',
+                                maxHeight: '350px',
+                                objectFit: 'cover'
+                            }}
+                            onError={(e) => {
+                                // Fallback if the image URL is broken or returns a 404
+                                e.target.src = 'https://placehold.co/600x400?text=No+Image+Found';
+                            }}
+                        />
+                    </div>
+                )}
+
+                <div>
+                    <input type="text" value=''
+                           onChange={e => setRecipeImageUrl(e.target.value)}
+                           className='input-style'
+                           placeholder='Add/update the image URL for your recipe. Most_delicious_pasta.png'
+                    />
+                </div>
 
                 {/* --- Scalar Fields Row (3 columns) --- */}
                 <div style={{ display: 'flex', gap: '20px' }}>
-                    <div style={{ flex: '2' }}>
-                        <label className='label-style'>Recipe Name</label>
+                    <div style={{ flex: '3' }}>
+                        <label className='label-style'>*Recipe Name</label>
                         <input type="text" value={name}
                                onChange={e => setName(e.target.value)}
-                               className='input-style' required
+                               className='input-style'
                                placeholder='Best Recipe Ever'
+                               required
                         />
                     </div>
                     <div style={{ flex: '1' }}>
-                        <label className='label-style'>Servings</label>
+                        <label className='label-style'>*Servings</label>
                         <input type="number" value={servingSize}
                                onChange={e =>
                                    setServingSize(e.target.value)}
                                className='input-style'
                                placeholder='3'
+                               required
                         />
                     </div>
                     <div style={{ flex: '1' }}>
-                        <label className='label-style'>Cooking Time (Mins)</label>
+                        <label className='label-style'>*Cooking Time (Mins)</label>
                         <input type="number" value={cookingTimeInMinutes}
                                onChange={e =>
                                    setCookingTimeInMinutes(e.target.value)}
                                className='input-style'
                                placeholder='15'
+                               required
                         />
                     </div>
                 </div>
@@ -171,13 +267,14 @@ function RecipeForm({ selectedRecipe, onClear }) {
                     {/* Ingredients Section */}
                     <div style={{ flex: '0 0 35%', backgroundColor: '#f8f9fa', padding: '15px',
                         borderRadius: '6px' }}>
-                        <label className='label-style'>Ingredients List</label>
+                        <label className='label-style'>*Ingredients List</label>
                         <textarea
                             value={ingredients}
                             onChange={e =>
                                 setIngredients(e.target.value)}
                             className='input-style textarea-style'
                             placeholder={selectedRecipe ? 'No ingredients added' : placeholderIngredients}
+                            required
                         />
                         <span style={{ display: 'block', marginTop: '6px', fontSize: '12px', color: '#6c757d', fontStyle: 'italic'}}>
                             * Format: One entry per line, space separated (e.g., "2 tbsp salt").
@@ -186,12 +283,13 @@ function RecipeForm({ selectedRecipe, onClear }) {
 
                     {/* Instructions Section */}
                     <div style={{ flex: '1', backgroundColor: '#f8f9fa', padding: '15px', borderRadius: '6px' }}>
-                        <label className='label-style'>Instructions</label>
+                        <label className='label-style'>*Instructions</label>
                         <textarea
                             value={steps}
                             onChange={e => setSteps(e.target.value)}
                             className='input-style textarea-style'
                             placeholder={selectedRecipe ? 'No instructions added' : placeholderSteps}
+                            required
                         />
                         <span style={{ display: 'block', marginTop: '6px', fontSize: '12px', color: '#6c757d', fontStyle: 'italic'}}>
                             * Format: Type your directions out naturally, hitting Enter for each new step.
@@ -202,11 +300,16 @@ function RecipeForm({ selectedRecipe, onClear }) {
                 {/* --- Form Control Actions --- */}
                 <div style={{ display: 'flex', gap: '12px', marginTop: '10px', justifyContent: 'flex-start' }}>
                     <button type="submit" className='highlighted-button'>
-                        {selectedRecipe?.id ? "Update Recipe" : "Create Recipe"}
+                        {isEditMode ? "Update Recipe" : "Create Recipe"}
                     </button>
-                    <button type="button" onClick={onClear} className='highlighted-button' style={{backgroundColor: 'gray'}}>
+                    <button type="button" onClick={clearForm} className='highlighted-button' style={{backgroundColor: 'gray'}}>
                         Clear Fields
                     </button>
+                    {isEditMode && (
+                        <button type="button" onClick={handleDelete} className='highlighted-button' style={{backgroundColor: 'red'}}>
+                            Delete Recipe
+                        </button>
+                    )}
                 </div>
             </form>
         </div>

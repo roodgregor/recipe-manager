@@ -1,9 +1,9 @@
 import React, {useState} from 'react';
 
-function RecipeList({ recipes, onSelectRecipe, onNewRecipeClick, onSearch }) {
+function RecipeList({ recipes, onSelectRecipe, onSearch }) {
     const [name, setName] = useState('');
     const [servingSize, setServingSize] = useState('');
-    const [tag, setTag] = useState('');
+    const [selectedTags, setSelectedTags] = useState([]);
     const [instruction, setInstruction] = useState('');
     const [hasIngredient, setHasIngredient] = useState('');
     const [excludesIngredient, setExcludesIngredient] = useState('');
@@ -21,11 +21,22 @@ function RecipeList({ recipes, onSelectRecipe, onNewRecipeClick, onSearch }) {
             name: name || undefined,
             servingSize: servingSize ? parseInt(servingSize, 10) : undefined,
             // Matches RecipeSearchRequest field names exactly
-            tags: commaSeparatedToArray(tag),
+            tags: selectedTags,
             instructions: commaSeparatedToArray(instruction),
             includeIngredients: commaSeparatedToArray(hasIngredient),
             excludeIngredients: commaSeparatedToArray(excludesIngredient)
         });
+    };
+
+    // Clear filters
+    const clearFilters = (e) => {
+        e.preventDefault();
+        setName('');
+        setServingSize('');
+        setSelectedTags([]);
+        setInstruction('');
+        setHasIngredient('');
+        setExcludesIngredient('');
     };
 
     return (
@@ -61,9 +72,46 @@ function RecipeList({ recipes, onSelectRecipe, onNewRecipeClick, onSearch }) {
                                        setServingSize(e.target.value)} className='input-style' />
                         </div>
                         <div>
-                            <label style={{ fontSize: '11px', color: '#666' }}>Tag (e.g., vegetarian)</label>
-                            <input type="text" value={tag} onChange={e => 
-                                setTag(e.target.value)} className='input-style' />
+                            <label style={{ fontSize: '11px', color: '#666', display: 'block', marginBottom: '8px' }}>
+                                Filter by Tags
+                            </label>
+
+                            <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px' }}>
+                                {[
+                                    "Vegan", "Dairy-Free", "Seafood", "Pasta", "Vegetarian",
+                                    "Pescatarian", "Baked", "One-Pot", "Fried & Crispy",
+                                    "No-Cook", "Grilled", "Soup"
+                                ].map(item => {
+                                    const isSelected = selectedTags.includes(item);
+
+                                    return (
+                                        <button
+                                            key={item}
+                                            type="button" // Prevents accidental form submissions
+                                            onClick={() => {
+                                                if (isSelected) {
+                                                    setSelectedTags(selectedTags.filter(t => t !== item));
+                                                } else {
+                                                    setSelectedTags([...selectedTags, item]);
+                                                }
+                                            }}
+                                            style={{
+                                                padding: '6px 12px',
+                                                borderRadius: '20px',
+                                                border: '1px solid #ccc',
+                                                fontSize: '13px',
+                                                cursor: 'pointer',
+                                                transition: 'all 0.2s ease',
+                                                backgroundColor: isSelected ? '#33b249' : '#fff',
+                                                color: isSelected ? '#fff' : '#333',
+                                                borderColor: isSelected ? '#33b249' : '#ccc',
+                                            }}
+                                        >
+                                            {item}
+                                        </button>
+                                    );
+                                })}
+                            </div>
                         </div>
                         <div>
                             <label style={{ fontSize: '11px', color: '#666' }}>Instruction Contains</label>
@@ -89,6 +137,11 @@ function RecipeList({ recipes, onSelectRecipe, onNewRecipeClick, onSearch }) {
                     </div>
                 )}
 
+                <button type="button"
+                        onClick={clearFilters}
+                        className='highlighted-button' style={{backgroundColor: 'gray'}}>
+                    Clear Filters
+                </button>
                 <button type="submit" className='highlighted-button'>
                     Search Recipes
                 </button>

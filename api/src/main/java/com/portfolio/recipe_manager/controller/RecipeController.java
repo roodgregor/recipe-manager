@@ -4,6 +4,7 @@ import com.portfolio.recipe_manager.dto.RecipeRequest;
 import com.portfolio.recipe_manager.dto.RecipeSearchRequest;
 import com.portfolio.recipe_manager.entity.Recipe;
 import com.portfolio.recipe_manager.dto.RecipeSearchResult;
+import com.portfolio.recipe_manager.exception.ExistingRecipeException;
 import com.portfolio.recipe_manager.exception.RecipeNotFoundException;
 import com.portfolio.recipe_manager.service.RecipeService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -56,6 +57,11 @@ public class RecipeController {
         description = "Registers a new recipe in the system, automatically processing its associated steps, " +
                 "ingredients, and descriptive tags.")
     public ResponseEntity<Recipe> createRecipe(@Valid @RequestBody RecipeRequest recipeCreateRequest) {
+        Recipe existing = recipeService.getRecipeByName(recipeCreateRequest.getName());
+        if (existing != null) {
+            throw new ExistingRecipeException("A recipe with the name " + recipeCreateRequest.getName() +
+                    " already exists. Use a different name to easily track your recipes.");
+        }
         Recipe newRecipe = recipeService.createRecipe(recipeCreateRequest);
         return new ResponseEntity<>(newRecipe, HttpStatus.CREATED);
     }
@@ -84,6 +90,11 @@ public class RecipeController {
                 " and details.")
     public ResponseEntity<Void> deleteRecipe(
             @PathVariable Long id) {
+        Recipe oldRecipe = recipeService.getRecipeById(id);
+        if (oldRecipe == null) {
+            throw new RecipeNotFoundException("Recipe with ID (" + id + ") not found." +
+                    "Verify correct Recipe ID to properly delete.");
+        }
         recipeService.deleteRecipe(id);
         return ResponseEntity.noContent().build();
     }

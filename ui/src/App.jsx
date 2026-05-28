@@ -1,10 +1,12 @@
 import React from 'react';
 import RecipeDashboard from './views/RecipeDashboard';
+import { Toaster } from 'sonner';
 
 function App() {
   return (
       <div className="App">
-        <RecipeDashboard />
+          <Toaster position="top-right" richColors />
+          <RecipeDashboard />
       </div>
   );
 }

@@ -21,6 +21,14 @@ export const getRecipeById = (id) => {
     return axios.get(`${API_BASE_URL}/${id}`);
 };
 
-export const searchRecipes = () => {
+export const createNewRecipe = (recipePayload = {}) => {
+    return axios.post(`${API_BASE_URL}`, recipePayload);
+};
 
+export const updateRecipe = (id, recipePayload = {}) => {
+    return axios.put(`${API_BASE_URL}/${id}`, recipePayload);
+};
+
+export const deleteRecipe = (id) => {
+    return axios.delete(`${API_BASE_URL}/${id}`);
 };

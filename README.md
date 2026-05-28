@@ -5,7 +5,7 @@ A full-stack recipe management system built without fluff. Small, but charming!
 ## Tech Stack
 
 - Backend Engine: Spring Boot v4.0.6 (Java 17)
-- Frontend: React
+- Frontend: React + Vite _(for lightweight deployment)_
 - Data Persistence: PostgreSQL + Spring Data JPA/Hibernate
 - Migration Control: Flyway
 - Documentation: OpenAPI 3 / Swagger UI

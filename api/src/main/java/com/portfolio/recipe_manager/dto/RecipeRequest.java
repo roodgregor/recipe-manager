@@ -20,6 +20,7 @@ public class RecipeRequest {
     @Min(value = 1, message = "Cooking time in minutes must be at least 1.")
     private Integer cookingTimeInMinutes = 1;
     private String description;
+    private String recipeImageUrl;
     @NotEmpty(message = "Recipe must have at least one ingredient.")
     private List<IngredientRequest> ingredients;
     @NotEmpty(message = "Recipe must have at least one step.")
