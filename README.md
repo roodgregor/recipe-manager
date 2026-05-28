@@ -18,7 +18,6 @@ A full-stack recipe management system built without fluff. Small, but charming!
 - Utilized DTOs such as _RecipeRequest_ for contracts, decoupling, and explicit privacy.
 - Dynamic query using Specifications under the JpaSpecificationExecutor to enable stacking multipe filters without complicated query chaining.
 - Used React as the Frontend to demonstrate RESTful API instead of using cURL or an external tool like Postman for ease of use and better demonstration of Frontend/Backend connection.
-- Chose to implement a dynamic tagging system to detect if recipes fall under criteria such as vegetarian, dairy, etc. for a smoother experience.
 
 ## Get Started! (Local Dev)
 
@@ -32,4 +31,5 @@ A full-stack recipe management system built without fluff. Small, but charming!
 
 - Unit testing was not completed for the sake of time and not present on the requirement list. If implemented, I would have used **JUnit** and **Mockito**, targeting the service layer, and covering the methods inside RecipeService.java.
 - Frontend is not fully fleshed out since it is not the priority of the demonstration, but may be further developed in future versions.
+- Chose to implement a dynamic tagging system to detect if recipes fall under criteria such as vegetarian, dairy, etc. for a smoother experience. Some tags may be inaccurate due to similar usages (e.g. 'bake' can be used for deserts and oven baked poultry).
 - 

@@ -109,28 +109,28 @@ function RecipeForm({ selectedRecipe, onClear }) {
                 {/* --- Scalar Fields Row (3 columns) --- */}
                 <div style={{ display: 'flex', gap: '20px' }}>
                     <div style={{ flex: '2' }}>
-                        <label className='labelStyle'>Recipe Name</label>
+                        <label className='label-style'>Recipe Name</label>
                         <input type="text" value={name}
                                onChange={e => setName(e.target.value)}
-                               className='inputStyle' required
+                               className='input-style' required
                                placeholder='Best Recipe Ever'
                         />
                     </div>
                     <div style={{ flex: '1' }}>
-                        <label className='labelStyle'>Servings</label>
+                        <label className='label-style'>Servings</label>
                         <input type="number" value={servingSize}
                                onChange={e =>
                                    setServingSize(e.target.value)}
-                               className='inputStyle'
+                               className='input-style'
                                placeholder='3'
                         />
                     </div>
                     <div style={{ flex: '1' }}>
-                        <label className='labelStyle'>Cooking Time (Mins)</label>
+                        <label className='label-style'>Cooking Time (Mins)</label>
                         <input type="number" value={cookingTimeInMinutes}
                                onChange={e =>
                                    setCookingTimeInMinutes(e.target.value)}
-                               className='inputStyle'
+                               className='input-style'
                                placeholder='15'
                         />
                     </div>
@@ -138,27 +138,45 @@ function RecipeForm({ selectedRecipe, onClear }) {
 
                 {/* --- Description Block --- */}
                 <div>
-                    <label className='labelStyle'>Description</label>
+                    <label className='label-style'>Description</label>
                     <textarea
                         value={description}
                         onChange={e => setDescription(e.target.value)}
-                        className='inputStyle'
+                        className='input-style'
                         placeholder='This is the best recipe in the world!'
                     />
                 </div>
 
                 <hr style={{ border: 0, borderTop: '1px solid #dee2e6', margin: '5px 0' }} />
 
+                <div style={{ flex: '1', backgroundColor: '#f8f9fa', padding: '15px', borderRadius: '6px' }}>
+                    {tags.length === 0 ? (
+                        <p style={{ fontSize: '13px', color: '#000000', fontStyle: 'italic' }}>
+                            No tags found for recipe.
+                        </p>
+                    ) : (
+                        <div className="tag-container">
+                            {tags.map((tag, idx) => (
+                                <span key={idx} className="tag-item">
+                                  {tag.tag}
+                                </span>
+                            ))}
+                        </div>
+                    )}
+                </div>
+
                 {/* --- Dynamic Content Area (Ingredients & Steps side-by-side) --- */}
                 <div style={{ display: 'flex', gap: '30px' }}>
 
                     {/* Ingredients Section */}
-                    <div style={{ flex: '1', backgroundColor: '#f8f9fa', padding: '15px', borderRadius: '6px' }}>
-                        <label className='labelStyle'>Ingredients List</label>
+                    <div style={{ flex: '0 0 35%', backgroundColor: '#f8f9fa', padding: '15px',
+                        borderRadius: '6px' }}>
+                        <label className='label-style'>Ingredients List</label>
                         <textarea
                             value={ingredients}
-                            onChange={e => setIngredients(e.target.value)}
-                            className='inputStyle textareaStyle'
+                            onChange={e =>
+                                setIngredients(e.target.value)}
+                            className='input-style textarea-style'
                             placeholder={selectedRecipe ? 'No ingredients added' : placeholderIngredients}
                         />
                         <span style={{ display: 'block', marginTop: '6px', fontSize: '12px', color: '#6c757d', fontStyle: 'italic'}}>
@@ -168,30 +186,17 @@ function RecipeForm({ selectedRecipe, onClear }) {
 
                     {/* Instructions Section */}
                     <div style={{ flex: '1', backgroundColor: '#f8f9fa', padding: '15px', borderRadius: '6px' }}>
-                        <label className='labelStyle'>Instructions</label>
+                        <label className='label-style'>Instructions</label>
                         <textarea
                             value={steps}
                             onChange={e => setSteps(e.target.value)}
-                            className='inputStyle textareaStyle'
+                            className='input-style textarea-style'
                             placeholder={selectedRecipe ? 'No instructions added' : placeholderSteps}
                         />
                         <span style={{ display: 'block', marginTop: '6px', fontSize: '12px', color: '#6c757d', fontStyle: 'italic'}}>
                             * Format: Type your directions out naturally, hitting Enter for each new step.
                         </span>
                     </div>
-                </div>
-
-                <div style={{ flex: '1', backgroundColor: '#f8f9fa', padding: '15px', borderRadius: '6px', width: '35%' }}>
-                    <h4 style={{ margin: '0 0 10px 0', color: '#495057' }}>Tags</h4>
-                    {tags.length === 0 ? (
-                        <p style={{ fontSize: '13px', color: '#6c757d', fontStyle: 'italic' }}>No tags found for recipe.</p>
-                    ) : (
-                        <div>
-                            {tags.map((tag, idx) => (
-                                <p key={idx}>{tag.tag}</p>
-                            ))}
-                        </div>
-                    )}
                 </div>
 
                 {/* --- Form Control Actions --- */}
