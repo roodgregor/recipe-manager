@@ -121,9 +121,13 @@ function RecipeForm({ selectedRecipe, onRefresh }) {
             let response;
             if (isEditMode) {
                 // call update PUT API call
-                response = await updateRecipe(selectedRecipe.id, fullRecipePayload);
-                console.log('Recipe updated successfully: ', response.data);
-                toast.success(`'${name}' updated successfully!`);
+                try {
+                    response = await updateRecipe(selectedRecipe.id, fullRecipePayload);
+                    console.log('Recipe updated successfully: ', response.data);
+                    toast.success(`'${name}' updated successfully!`);
+                } catch (error) {
+                    toast.error(error.response);
+                }
             } else {
                 // call create POST API call
                 response = await createNewRecipe(fullRecipePayload);
@@ -132,6 +136,17 @@ function RecipeForm({ selectedRecipe, onRefresh }) {
                 clearForm();
             }
         } catch (error) {
+            handleError(error);
+        }
+    };
+
+    const handleError = (error) => {
+        if (error.response && error.response.status === 400) {
+            const validationErrors = error.response.data;
+            Object.keys(validationErrors).forEach((field) => {
+                toast.error(validationErrors[field]);
+            });
+        } else {
             console.error('Error:', error.response?.data || error.message);
             toast.error('Error creating recipe', {
                 description: error.response?.data.message || error.message || 'Please verify the required fields before submitting again.',

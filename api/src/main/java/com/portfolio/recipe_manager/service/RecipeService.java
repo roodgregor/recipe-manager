@@ -77,7 +77,17 @@ public class RecipeService {
             }
         }
 
-        return recipeRepository.findBy(spec, query -> query
+        // Combine everything into an effectively final variable
+        final Specification<Recipe> finalSpec = spec;
+
+        // Intercept the query creation process to pass the true distinct flag down to Hibernate
+        // Case: covers the duplicates found by checking multiple fields in the same search box.
+        Specification<Recipe> distinctSpec = (root, query, cb) -> {
+            query.distinct(true);
+            return finalSpec.toPredicate(root, query, cb);
+        };
+
+        return recipeRepository.findBy(distinctSpec, query -> query
                 .as(RecipeSearchResult.class)
                 .page(pageable));
     }

@@ -1,6 +1,6 @@
 import React, {useState} from 'react';
 
-function RecipeList({ recipes, onSelectRecipe, onSearch }) {
+function RecipeList({ recipes, currentPage, totalPages, onSelectRecipe, onSearch, onPageChange }) {
     const [name, setName] = useState('');
     const [servingSize, setServingSize] = useState('');
     const [selectedTags, setSelectedTags] = useState([]);
@@ -57,7 +57,7 @@ function RecipeList({ recipes, onSelectRecipe, onSearch }) {
                 {/* Toggle Advanced Filters */}
                 <span
                     onClick={() => setShowAdvanced(!showAdvanced)}
-                    style={{ fontSize: '12px', color: '#007bff', cursor: 'pointer',
+                    style={{ fontSize: '12px', color: '#33b249', cursor: 'pointer',
                         userSelect: 'none', textAlign: 'right' }}
                 >
                     {showAdvanced ? '▴ Hide Advanced Filters' : '▾ Show Advanced Filters'}
@@ -149,25 +149,72 @@ function RecipeList({ recipes, onSelectRecipe, onSearch }) {
             </form>
 
             <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
-                {recipes.map((recipe) => (
-                    <div
-                        key={recipe.id}
-                        onClick={() => onSelectRecipe(recipe)}
+                {recipes.length === 0 ? (
+                    <p style={{ textAlign: 'center', color: '#666' }}>No recipes found.</p>
+                ) : (
+                    recipes.map((recipe) => (
+                        <div
+                            key={recipe.id}
+                            onClick={() => onSelectRecipe(recipe)}
+                            style={{
+                                padding: '15px',
+                                borderRadius: '6px',
+                                border: '1px solid #eee',
+                                cursor: 'pointer',
+                                background: '#fcfcfc'
+                            }}
+                        >
+                            <h5 style={{ margin: '0 0 5px 0', color: '#000' }}>{recipe.name}</h5>
+                            <p style={{ margin: '0 0 10px 0', fontSize: '12px', color: '#000' }}>
+                                {recipe.description}
+                            </p>
+                        </div>
+                    ))
+                )}
+            </div>
+
+            {/* Pagination Controls */}
+            {totalPages > 1 && (
+                <div style={{
+                    display: 'flex',
+                    justifyContent: 'center',
+                    alignItems: 'center',
+                    gap: '10px',
+                    marginTop: '10px'
+                }}>
+                    <button
+                        onClick={() => onPageChange(currentPage - 1)}
+                        disabled={currentPage === 0}
                         style={{
-                            padding: '15px',
-                            borderRadius: '6px',
-                            border: '1px solid #eee',
-                            cursor: 'pointer',
-                            background: '#fcfcfc'
+                            padding: '6px 12px',
+                            borderRadius: '4px',
+                            border: '1px solid #ccc',
+                            background: currentPage === 0 ? '#f0f0f0' : '#fff',
+                            cursor: currentPage === 0 ? 'not-allowed' : 'pointer'
                         }}
                     >
-                        <h5 style={{ margin: '0 0 5px 0', color: '#000' }}>{recipe.name}</h5>
-                        <p style={{ margin: '0 0 10px 0', fontSize: '12px', color: '#000' }}>
-                            {recipe.description}
-                        </p>
-                    </div>
-                ))}
-            </div>
+                        Previous
+                    </button>
+
+                    <span style={{ fontSize: '14px', color: '#333' }}>
+                        Page <strong>{currentPage + 1}</strong> of {totalPages}
+                    </span>
+
+                    <button
+                        onClick={() => onPageChange(currentPage + 1)}
+                        disabled={currentPage >= totalPages - 1}
+                        style={{
+                            padding: '6px 12px',
+                            borderRadius: '4px',
+                            border: '1px solid #ccc',
+                            background: currentPage >= totalPages - 1 ? '#f0f0f0' : '#fff',
+                            cursor: currentPage >= totalPages - 1 ? 'not-allowed' : 'pointer'
+                        }}
+                    >
+                        Next
+                    </button>
+                </div>
+            )}
         </div>
     );
 }

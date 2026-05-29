@@ -7,9 +7,13 @@ import RecipeForm from '../components/RecipeForm.jsx';
 function RecipeDashboard() {
     const [recipes, setRecipes] = useState([]);
     const [currentRecipe, setCurrentRecipe] = useState(null);
+    const [totalPages, setTotalPages] = useState(0);
+    const [currentPage, setCurrentPage] = useState(0);
+    const [currentFilters, setCurrentFilters] = useState({});
+    const PAGE_SIZE = 5;
 
     useEffect(() => {
-        handleSearch();
+        handleSearch({});
     }, []);
 
     // onclick search result for full payload
@@ -28,11 +32,12 @@ function RecipeDashboard() {
             });
     };
 
-    // applied filters search
-    const handleSearch = (filterPayload) => {
-        getAllRecipes(filterPayload)
+    const fetchRecipesHelper = (filterPayload, page) => {
+        getAllRecipes(filterPayload, page, PAGE_SIZE)
             .then(response => {
-                setRecipes(response.data.content || [])
+                setRecipes(response.data.content || []);
+                setTotalPages(response.data.totalPages || 0);
+                setCurrentPage(response.data.number || 0);
             })
             .catch(error => {
                 console.error('Error fetching recipes with selected payload:', error)
@@ -43,6 +48,18 @@ function RecipeDashboard() {
                 })
             });
     };
+
+    // applied filters search
+    const handleSearch = (filterPayload) => {
+        setCurrentPage(0); // Reset to page 0 on a new search
+        setCurrentFilters(filterPayload);
+        fetchRecipesHelper(filterPayload, 0); // call fetch recipes filter
+    };
+
+    const handlePageChange = (newPage) => {
+        setCurrentPage(newPage);
+        fetchRecipesHelper(currentFilters, newPage);
+    }
 
     const handleRefresh = () => {
         setCurrentRecipe(null);
@@ -65,8 +82,11 @@ function RecipeDashboard() {
             }}>
                 <RecipeList
                     recipes={recipes}
+                    currentPage={currentPage}
+                    totalPages={totalPages}
                     onSelectRecipe={handleSelectRecipe}
                     onSearch={handleSearch}
+                    onPageChange={handlePageChange}
                 />
             </div>
 
