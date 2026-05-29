@@ -132,6 +132,16 @@ Every engineering project involves trade-offs. To deliver a defensible, function
 
 ---
 
+## Key Feature Opportunities
+
+* **Images for Ingredients and Steps:** A full-fledged recipe manager would benefit from having the option to add images for each ingredient and/or step.
+* **Recipe Sorting for Dish Types:** Categorize between different dish types, such as snack, meal, appetizer, etc.
+* **Nutrition Facts:** Calorie tracking, and health nutrition facts would be helpful for health-conscious, and friends tracking their intake (e.g. sodium, fat, etc.)
+* **Separate Preparation Time and Cooking Time:** Seasoned chefs know that _mis en place_ is highly essential to a successful routine. Adding a dedicated preparation time would make recipe's easier to process.
+* **Print Recipe to PDF:** Nice to have feature that could consolidate a recipe into a view-only format that can be stored locally.
+
+---
+
 ## Author
 
 - Joshua Medina
