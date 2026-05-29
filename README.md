@@ -4,6 +4,12 @@ A full-stack recipe management system built without fluff. Small, but charming!
 
 ![Application Banner](https://lh3.googleusercontent.com/d/1DsDsuI0wHvOcSdSGljT9-2IhzFtWlW5a)
 
+## Demo
+
+* May 29, 2026
+
+[![Watch the video](https://cdn.loom.com/sessions/thumbnails/895316ac47784afcafa5762f56cb89b5-4134a98a83abc7a0-full-play.gif#t=0.1)](https://www.loom.com/share/895316ac47784afcafa5762f56cb89b5)
+
 ## Tech Stack
 
 ### Backend
