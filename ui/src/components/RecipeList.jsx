@@ -57,7 +57,7 @@ function RecipeList({ recipes, currentPage, totalPages, onSelectRecipe, onSearch
                 {/* Toggle Advanced Filters */}
                 <span
                     onClick={() => setShowAdvanced(!showAdvanced)}
-                    style={{ fontSize: '12px', color: '#33b249', cursor: 'pointer',
+                    style={{ fontSize: '14px', color: '#33b249', cursor: 'pointer',
                         userSelect: 'none', textAlign: 'right' }}
                 >
                     {showAdvanced ? '▴ Hide Advanced Filters' : '▾ Show Advanced Filters'}
@@ -97,7 +97,7 @@ function RecipeList({ recipes, currentPage, totalPages, onSelectRecipe, onSearch
                                                 }
                                             }}
                                             style={{
-                                                padding: '6px 12px',
+                                                padding: '6px 14px',
                                                 borderRadius: '20px',
                                                 border: '1px solid #ccc',
                                                 fontSize: '13px',
@@ -150,7 +150,7 @@ function RecipeList({ recipes, currentPage, totalPages, onSelectRecipe, onSearch
 
             <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
                 {recipes.length === 0 ? (
-                    <p style={{ textAlign: 'center', color: '#666' }}>No recipes found.</p>
+                    <p style={{ textAlign: 'center', color: '#666', fontSize: '14px' }}>No recipes found.</p>
                 ) : (
                     recipes.map((recipe) => (
                         <div
@@ -165,7 +165,7 @@ function RecipeList({ recipes, currentPage, totalPages, onSelectRecipe, onSearch
                             }}
                         >
                             <h5 style={{ margin: '0 0 5px 0', color: '#000' }}>{recipe.name}</h5>
-                            <p style={{ margin: '0 0 10px 0', fontSize: '12px', color: '#000' }}>
+                            <p style={{ margin: '0 0 10px 0', fontSize: '14px', color: '#000' }}>
                                 {recipe.description}
                             </p>
                         </div>
@@ -186,7 +186,7 @@ function RecipeList({ recipes, currentPage, totalPages, onSelectRecipe, onSearch
                         onClick={() => onPageChange(currentPage - 1)}
                         disabled={currentPage === 0}
                         style={{
-                            padding: '6px 12px',
+                            padding: '6px 14px',
                             borderRadius: '4px',
                             border: '1px solid #ccc',
                             background: currentPage === 0 ? '#f0f0f0' : '#fff',
@@ -204,7 +204,7 @@ function RecipeList({ recipes, currentPage, totalPages, onSelectRecipe, onSearch
                         onClick={() => onPageChange(currentPage + 1)}
                         disabled={currentPage >= totalPages - 1}
                         style={{
-                            padding: '6px 12px',
+                            padding: '6px 14px',
                             borderRadius: '4px',
                             border: '1px solid #ccc',
                             background: currentPage >= totalPages - 1 ? '#f0f0f0' : '#fff',

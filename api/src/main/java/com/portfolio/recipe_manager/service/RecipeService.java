@@ -9,6 +9,7 @@ import com.portfolio.recipe_manager.exception.InvalidIngredientsLineException;
 import com.portfolio.recipe_manager.exception.RecipeNotFoundException;
 import com.portfolio.recipe_manager.repository.RecipeRepository;
 import com.portfolio.recipe_manager.repository.specification.RecipeSpecifications;
+import com.portfolio.recipe_manager.utils.QuerySanitizer;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
@@ -44,10 +45,11 @@ public class RecipeService {
         Specification<Recipe> spec = (root, query, builder) -> builder.conjunction();
 
         if (request.getName() != null && !request.getName().isBlank()) {
-            Specification<Recipe> nameAndDescriptionSpec = RecipeSpecifications.nameContains(request.getName())
-                    .or(RecipeSpecifications.descriptionContains(request.getName()))
-                    .or(RecipeSpecifications.includesIngredient(request.getName()))
-                    .or(RecipeSpecifications.instructionContains(request.getName()));
+            String name = QuerySanitizer.escapeLike(request.getName());
+            Specification<Recipe> nameAndDescriptionSpec = RecipeSpecifications.nameContains(name)
+                    .or(RecipeSpecifications.descriptionContains(name))
+                    .or(RecipeSpecifications.includesIngredient(name))
+                    .or(RecipeSpecifications.instructionContains(name));
             spec = spec.and(nameAndDescriptionSpec);
         }
         if (request.getServingSize() != null) {
@@ -58,22 +60,23 @@ public class RecipeService {
         }
         if (request.getTags() != null) {
             for (String tag : request.getTags()) {
-                spec = spec.and(RecipeSpecifications.hasTag(tag));
+                // Probably unneeded since the UI uses buttons, but guarding for direct API usage
+                spec = spec.and(RecipeSpecifications.hasTag(QuerySanitizer.escapeLike(tag)));
             }
         }
         if (request.getInstructions() != null) {
             for (String instruction : request.getInstructions()) {
-                spec = spec.and(RecipeSpecifications.instructionContains(instruction));
+                spec = spec.and(RecipeSpecifications.instructionContains(QuerySanitizer.escapeLike(instruction)));
             }
         }
         if (request.getIncludeIngredients() != null) {
             for (String ingredient : request.getIncludeIngredients()) {
-                spec = spec.and(RecipeSpecifications.includesIngredient(ingredient));
+                spec = spec.and(RecipeSpecifications.includesIngredient(QuerySanitizer.escapeLike(ingredient)));
             }
         }
         if (request.getExcludeIngredients() != null) {
             for (String ingredient : request.getExcludeIngredients()) {
-                spec = spec.and(RecipeSpecifications.excludesIngredient(ingredient));
+                spec = spec.and(RecipeSpecifications.excludesIngredient(QuerySanitizer.escapeLike(ingredient)));
             }
         }
 
@@ -102,7 +105,7 @@ public class RecipeService {
     @Cacheable(value = "recipe", key = "#name")
     @Transactional(readOnly = true)
     public Recipe getRecipeByName(String name) {
-        return recipeRepository.findByName(name)
+        return recipeRepository.findByName(QuerySanitizer.escapeLike(name))
                 .orElse(null);
     }
 
