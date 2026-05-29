@@ -220,14 +220,6 @@ function RecipeForm({ selectedRecipe, onRefresh }) {
                     </div>
                 )}
 
-                <div>
-                    <input type="text" value=''
-                           onChange={e => setRecipeImageUrl(e.target.value)}
-                           className='input-style'
-                           placeholder='Add/update the image URL for your recipe. Most_delicious_pasta.png'
-                    />
-                </div>
-
                 {/* --- Scalar Fields Row (3 columns) --- */}
                 <div style={{ display: 'flex', gap: '20px' }}>
                     <div style={{ flex: '3' }}>
@@ -324,6 +316,15 @@ function RecipeForm({ selectedRecipe, onRefresh }) {
                             * Format: Type your directions out naturally, hitting Enter for each new step.
                         </span>
                     </div>
+                </div>
+
+                <div>
+                    <label className='label-style' style={{marginLeft: 'auto'}}>Recipe Image URL</label>
+                    <input type="text" value={recipeImageUrl}
+                           onChange={e => setRecipeImageUrl(e.target.value)}
+                           className='input-style'
+                           placeholder='Add/update the image URL for your recipe. Most_delicious_pasta.png'
+                    />
                 </div>
 
                 {/* --- Form Control Actions --- */}

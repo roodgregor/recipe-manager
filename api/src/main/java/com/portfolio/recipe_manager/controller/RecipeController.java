@@ -36,7 +36,7 @@ public class RecipeController {
         description = "Retrieves a paginated list of recipe summaries tailored to your search criteria and" +
                 " selected ingredient filters.")
     public ResponseEntity<Page<RecipeSearchResult>> searchRecipes(
-            @ParameterObject @ModelAttribute RecipeSearchRequest request,
+            @Valid @ParameterObject @ModelAttribute RecipeSearchRequest request,
             @PageableDefault(size = 25, sort = "id") Pageable pageable) {
         try {
             Page<RecipeSearchResult> results = recipeService.searchRecipes(request, pageable);
