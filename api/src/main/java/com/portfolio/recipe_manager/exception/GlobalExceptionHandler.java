@@ -15,6 +15,7 @@ import java.util.Map;
 public class GlobalExceptionHandler {
     @ExceptionHandler(RecipeNotFoundException.class)
     public ResponseEntity<Object> recipeNotFound(RecipeNotFoundException ex) {
+        // Custom exception: Used for checking a recipe before Updating and Deleting
         Map<String, Object> body = new HashMap<>();
         body.put("timestamp", LocalDateTime.now());
         body.put("message", ex.getMessage());
@@ -23,6 +24,7 @@ public class GlobalExceptionHandler {
     }
     @ExceptionHandler(ExistingRecipeException.class)
     public ResponseEntity<Object> duplicateRecipeFound(ExistingRecipeException ex) {
+        // Custom exception: Used for checking a recipe with the same name already exists upon creation.
         Map<String, Object> body = new HashMap<>();
         body.put("timestamp", LocalDateTime.now());
         body.put("message", ex.getMessage());
@@ -31,6 +33,8 @@ public class GlobalExceptionHandler {
     }
     @ExceptionHandler(IncompleteRequiredFieldsException.class)
     public ResponseEntity<Object> incompleteRequiredFields(IncompleteRequiredFieldsException ex) {
+        // Caught by UI validation in latest version, but kept here just in case the controller function is extended.
+        // Case: A required field is missing from JSON payload if the API is used not through the UI.
         Map<String, Object> body = new HashMap<>();
         body.put("timestamp", LocalDateTime.now());
         body.put("message", ex.getMessage());
@@ -39,6 +43,17 @@ public class GlobalExceptionHandler {
     }
     @ExceptionHandler(InvalidIngredientsLineException.class)
     public ResponseEntity<Object> incompleteRequiredFields(InvalidIngredientsLineException ex) {
+        // Custom exception: similar to HttpMessageNotReadableException, but more specific to Ingredients
+        Map<String, Object> body = new HashMap<>();
+        body.put("timestamp", LocalDateTime.now());
+        body.put("message", ex.getMessage());
+
+        return new ResponseEntity<>(body, HttpStatus.BAD_REQUEST);
+    }
+    @ExceptionHandler(InvalidFieldValueException.class)
+    public ResponseEntity<Object> invalidFieldValue(InvalidFieldValueException ex) {
+        // Custom exception: Used for invalid field values, namely a negative quantity on ingredients, serving size,
+        // or cooking time in minutes.
         Map<String, Object> body = new HashMap<>();
         body.put("timestamp", LocalDateTime.now());
         body.put("message", ex.getMessage());
@@ -54,6 +69,9 @@ public class GlobalExceptionHandler {
     }
     @ExceptionHandler(HttpMessageNotReadableException.class)
     public ResponseEntity<String> handleHttpMessageExceptions(HttpMessageNotReadableException ex) {
+        // Caught by UI validation in latest version, but kept here just in case.
+        // Case: Ingredients field does not follow input pattern and passes "asdf" to when a line is expected
+        // to follow the following pattern: "10 unit ingredient"
         return new ResponseEntity<>(ex.getMessage(), HttpStatus.BAD_REQUEST);
     }
 }

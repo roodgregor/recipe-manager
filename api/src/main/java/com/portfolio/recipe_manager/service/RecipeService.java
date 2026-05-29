@@ -4,6 +4,7 @@ import com.portfolio.recipe_manager.dto.RecipeRequest;
 import com.portfolio.recipe_manager.dto.RecipeSearchRequest;
 import com.portfolio.recipe_manager.dto.RecipeSearchResult;
 import com.portfolio.recipe_manager.entity.*;
+import com.portfolio.recipe_manager.exception.InvalidFieldValueException;
 import com.portfolio.recipe_manager.exception.InvalidIngredientsLineException;
 import com.portfolio.recipe_manager.exception.RecipeNotFoundException;
 import com.portfolio.recipe_manager.repository.RecipeRepository;
@@ -98,6 +99,10 @@ public class RecipeService {
         if (request.getIngredients() != null) {
             request.getIngredients().forEach(req -> {
                 try {
+                    // BigDecimal check for checking if positive
+                    if (req.getQuantity() == null || req.getQuantity().signum() <= 0){
+                        throw new InvalidFieldValueException("Number values must be greater than 0.");
+                    }
                     RecipeIngredient ingredient = new RecipeIngredient();
                     ingredient.setName(req.getName());
                     ingredient.setUnit(req.getUnit());
@@ -139,6 +144,9 @@ public class RecipeService {
     @CacheEvict(value = {"recipe"}, allEntries = true)
     @Transactional
     public Recipe createRecipe(RecipeRequest request) {
+        if (request.getServingSize() <= 0 || request.getCookingTimeInMinutes() <= 0) {
+            throw new InvalidFieldValueException("Number values must be greater than 0.");
+        }
         Recipe recipe = Recipe.builder()
                 .name(request.getName())
                 .servingSize(request.getServingSize())
@@ -154,6 +162,10 @@ public class RecipeService {
     @CacheEvict(value = {"recipe"}, allEntries = true)
     @Transactional
     public Recipe updateRecipe(RecipeRequest request, Recipe originalRecipe) {
+        if (request.getServingSize() <= 0 || request.getCookingTimeInMinutes() <= 0) {
+            throw new InvalidFieldValueException("Number values must be greater than 0.");
+        }
+
         // DB deletion enabled by orphanRemoval=true in Recipe.java entity
         originalRecipe.getIngredients().clear();
         originalRecipe.getSteps().clear();
