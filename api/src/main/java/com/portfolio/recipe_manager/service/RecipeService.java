@@ -51,6 +51,9 @@ public class RecipeService {
             spec = spec.and(nameAndDescriptionSpec);
         }
         if (request.getServingSize() != null) {
+            if (request.getServingSize() <= 0) {
+                throw new InvalidFieldValueException("Serving size must be a positive integer.");
+            }
             spec = spec.and(RecipeSpecifications.hasServingSize(request.getServingSize()));
         }
         if (request.getTags() != null) {

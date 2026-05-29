@@ -65,6 +65,7 @@ function RecipeList({ recipes, onSelectRecipe, onSearch }) {
 
                 {showAdvanced && (
                     <div style={{ display: 'flex', flexDirection: 'column', gap: '10px', borderTop: '1px solid #ddd', paddingTop: '10px' }}>
+                        <label style={{ fontSize: '11px', color: '#666', fontStyle: 'italic' }}>Note: For multiple entries, separate by comma.<br/>E.g. "egg,bacon,cheese"</label>
                         <div>
                             <label style={{ fontSize: '11px', color: '#666' }}>Exact Serving Size</label>
                             <input type="number" value={servingSize} 

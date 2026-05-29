@@ -5,6 +5,7 @@ import com.portfolio.recipe_manager.dto.RecipeSearchRequest;
 import com.portfolio.recipe_manager.entity.Recipe;
 import com.portfolio.recipe_manager.dto.RecipeSearchResult;
 import com.portfolio.recipe_manager.exception.ExistingRecipeException;
+import com.portfolio.recipe_manager.exception.InvalidFieldValueException;
 import com.portfolio.recipe_manager.exception.RecipeNotFoundException;
 import com.portfolio.recipe_manager.service.RecipeService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -37,8 +38,12 @@ public class RecipeController {
     public ResponseEntity<Page<RecipeSearchResult>> searchRecipes(
             @ParameterObject @ModelAttribute RecipeSearchRequest request,
             @PageableDefault(size = 25, sort = "id") Pageable pageable) {
-        Page<RecipeSearchResult> results = recipeService.searchRecipes(request, pageable);
-        return ResponseEntity.ok(results);
+        try {
+            Page<RecipeSearchResult> results = recipeService.searchRecipes(request, pageable);
+            return ResponseEntity.ok(results);
+        } catch (Exception e) {
+            throw new InvalidFieldValueException(e.getMessage());
+        }
     }
 
     // GET /api/v1/recipes/1

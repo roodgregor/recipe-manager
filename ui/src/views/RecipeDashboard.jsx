@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { getAllRecipes, getRecipeById } from '../services/recipeService';
+import { toast } from 'sonner';
 import RecipeList from '../components/RecipeList.jsx';
 import RecipeForm from '../components/RecipeForm.jsx';
 
@@ -19,6 +20,11 @@ function RecipeDashboard() {
             })
             .catch(error => {
                 console.error(`Error fetching full payload of recipe ID ${leanRecipe.id}:`, error)
+                const errorMessage = error.response?.data?.message || 'Error fetching recipes.';
+                toast.error(`Error fetching recipe ID ${leanRecipe.id}`, {
+                    description: errorMessage,
+                    duration: 5000
+                })
             });
     };
 
@@ -30,6 +36,11 @@ function RecipeDashboard() {
             })
             .catch(error => {
                 console.error('Error fetching recipes with selected payload:', error)
+                const errorMessage = error.response?.data?.message || 'Error fetching recipes.';
+                toast.error('Error fetching recipes with selected payload', {
+                    description: errorMessage,
+                    duration: 5000
+                })
             });
     };
 
